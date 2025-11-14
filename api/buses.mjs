@@ -16,12 +16,16 @@ export const handler = async (event, context) => {
     // console.log("headers:", event.headers);
     const { headers } = event;
 
+    const credentials = {
+        accessKeyId: process.env.MOCS_AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.MOCS_AWS_SECRET_ACCESS_KEY,
+    };
+
+    console.log(credentials);
+
     const ddbClient = new DynamoDBClient({
         region: "us-east-2",
-        credentials: {
-            accessKeyId: process.env.MOCS_AWS_ACCESS_KEY_ID,
-            secretAccessKey: process.env.MOCS_AWS_SECRET_ACCESS_KEY,
-        }
+        credentials
     });
 
     const ddbDocClient = DynamoDBDocumentClient.from(ddbClient);
