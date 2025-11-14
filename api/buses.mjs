@@ -1,0 +1,75 @@
+const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
+const { DynamoDBDocumentClient, QueryCommand } = require("@aws-sdk/lib-dynamodb");
+
+const TABLE_NAME = "TaipLocationData-dev";
+const VEHICLE_IDS = ["0135", "0143", "0754", "0756", "0757"];
+
+function clean_number(n) {
+    if (n.startsWith("+")) n = n.replace("+", "");
+    n = n.replace(/(\d{4})$/, ".$1");
+    return Number(n);
+}
+
+export const handler = async (event, context) => {
+    // console.log("process.env:", process.env);
+    // grab access token from headers;
+    // console.log("headers:", event.headers);
+    const { headers } = event;
+
+    const ddbClient = new DynamoDBClient({ region: "us-east-2" });
+
+    const ddbDocClient = DynamoDBDocumentClient.from(ddbClient);
+
+    // scan dynamodb for each vehicle ID
+    const geojson = {
+        type: "FeatureCollection",
+        features: []
+    };
+
+    for (let i = 0; i < VEHICLE_IDS.length; i++) {
+        const vehicleId = VEHICLE_IDS[i];
+
+        const queryParams = {
+            TableName: TABLE_NAME,
+            KeyConditionExpression: "vehicleId = :vId",
+            ExpressionAttributeValues: { ":vId": vehicleId },
+            // Set ScanIndexForward to false to sort by 'timestamp' descending (newest first)
+            ScanIndexForward: false,             
+            Limit: 1 
+        };
+
+        const data = await ddbDocClient.send(new QueryCommand(queryParams));
+
+        const item = data.Items[0];
+        if (item) {
+            const latitude = clean_number(item.latitude);
+            const longitude = clean_number(item.longitude);
+
+            geojson.features.push({
+                type: "Feature",
+                properties: {
+                    vehicleId,
+                    latitude,
+                    longitude,
+                    timestamp: item.timestamp
+                },
+                geometry: {
+                    type: "Point",
+                    coordinates: [
+                        longitude,
+                        latitude
+                    ]
+                }
+            });
+        }
+    }
+
+    return {
+        statusCode: 200,
+        body: JSON.stringify(geojson),
+        headers: {
+            "Content-Type": "application/json"
+        }
+    };
+};
+  

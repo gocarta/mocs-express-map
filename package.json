@@ -1,0 +1,18 @@
+{
+  "name": "mocs-express-map",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "netlify dev --functions=api",
+    "test": "node test.js"
+  },
+  "devDependencies": {
+    "netlify-cli": "^23.1.3"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.931.0",
+    "@aws-sdk/client-s3": "^3.864.0",
+    "@aws-sdk/lib-dynamodb": "^3.931.0"
+  }
+}
