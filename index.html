@@ -197,6 +197,7 @@
                 background: rgb(126, 214, 39);
             }
             .marker-inner-text {
+                font-size: 10px;
                 left: 50%;
                 position: absolute;
                 transform: translate(-50%, -50%);
@@ -289,7 +290,7 @@
                     // create a DOM element for the marker
                     const el = document.createElement('div');
                     el.className = "marker bus";
-                    el.innerHTML = `<div class="marker-inner bus-inner"><div class="marker-inner-text"></div></div>`;
+                    el.innerHTML = `<div class="marker-inner bus-inner"><div class="marker-inner-text">${bus.properties.vehicleId}</div></div>`;
 
                     const marker = new maplibregl.Marker( { element: el }).setLngLat(point).addTo(map);
 
