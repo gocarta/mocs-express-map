@@ -2,7 +2,7 @@ const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
 const { DynamoDBDocumentClient, QueryCommand } = require("@aws-sdk/lib-dynamodb");
 
 const TABLE_NAME = "TaipLocationData-dev";
-const VEHICLE_IDS = ["0135", "0754", "0756", "0757"];
+const VEHICLE_IDS = ["0143", "0754", "0756", "0757"];
 
 function clean_number(n) {
     if (n.startsWith("+")) n = n.replace("+", "");
