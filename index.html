@@ -217,7 +217,8 @@
         <script>
             window.app = {
                 config: {
-                    buses: "/.netlify/functions/buses"
+                    buses: "/.netlify/functions/buses",
+                    routes: "https://gocarta.s3.us-east-2.amazonaws.com/public/data/simple_bus_routes/v1/data.lines.geojson" 
                 },
                 data: {
                     buses: null
@@ -267,6 +268,31 @@
                 map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-right');
             }
 
+            (async function update_routes () {
+                const res = await fetch(window.app.config.routes);
+                const routes_geojson = await res.json();
+                console.log(routes_geojson);
+                const mocs_express_route = routes_geojson.features.find(feature => feature.properties.name.toUpperCase() === "MOCS EXPRESS");
+
+                map.addSource('mocs-express-route', {
+                    'type': 'geojson',
+                    'data': mocs_express_route
+                });
+
+                map.addLayer({
+                    'id': 'mocs-express-route-layer',
+                    'type': 'line',
+                    'source': 'mocs-express-route',
+                    'layout': {
+                        'line-join': 'round',
+                        'line-cap': 'round'
+                    },
+                    'paint': {
+                        'line-color': "#FFB81C",
+                        'line-width': 3,
+                    }
+                });              
+            })();
 
             async function update_buses () {
                 console.log("updating buses");
